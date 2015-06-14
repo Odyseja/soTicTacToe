@@ -5,6 +5,7 @@ char sign;
 fd_set readset;
 int size=30;
 char board[BORAD_SIZE][BORAD_SIZE];
+char* ADDR="./serv";
 
 void printBoard(){
     for(int i=1; i<=size; i++){
@@ -115,9 +116,12 @@ void cleanUp(){
     }
     (void) shutdown(SocketFD, SHUT_RDWR);
     close(SocketFD);
+    unlink(ADDR);
+    exit(0);
 }
 
 void finish(int sig){
+    printf("I've got signal\n");
     exit(0);
 }
 
@@ -152,28 +156,35 @@ int main(int argc, char** argv){
         }
         read(SocketFD, buff, 100);
         ms=*((struct message*)&buff);
-        /*if(ms.x==WIN){
+        if(ms.state==WIN){
+            system("clear");
+            printBoard();
             printf("!!!!!!!!YOU WON!!!!!!!!!!\n");
-            printf("To return to main menu, press any key\n");
+            printf("To return to main menu, press any key and enter\n");
             scanf(" %c", &sign);
             cleanUp();
             execl("./tictactoe", "tictactoe", NULL);
 
         }
-        if(ms.x==LOOSE){
+        if(ms.state==LOOSE){
+            system("clear");
+            board[ms.x][ms.y]=ms.sign;
+            printBoard();
             printf("!!!!!!!!YOU LOST!!!!!!!!!!\n");
-            printf("To return to main menu, press any key\n");
+            printf("To return to main menu, press any key and enter\n");
             scanf(" %c", &sign);
             cleanUp();
             execl("./tictactoe", "tictactoe", NULL);
-        }*/
+        }
         if(ms.x!=-1){
             board[ms.x][ms.y]=ms.sign;
             system("clear");
             printf("%d %d: %c\n", ms.x, ms.y, ms.sign);
         }
-        printf("Your turn\n");
-        yourTurn();
+        if(ms.x==-1 || ms.x>0){
+            printf("Your turn\n");
+            yourTurn();
+        }
 
         FD_SET(SocketFD, &readset);
     }

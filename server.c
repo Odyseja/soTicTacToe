@@ -164,28 +164,25 @@ void handleMessage(int i){
         exit(0);
     }
     board[msg.x][msg.y]=msg.sign;
-    if(i==playerOne.socket)sendMessage(playerTwo.socket);
-    else sendMessage(playerOne.socket);
-    /*if(checkBoard()==true){
+
+    if(checkBoard()==true){
         if(msg.sign==playerOne.sign) {
-            msg.x=WIN;
-            sendMessage(playerOne.sign);
-            sendMessage(playerOne.sign);
-            msg.x=LOOSE;
-            sendMessage(playerTwo.sign);
-            sendMessage(playerTwo.sign);
+            msg.state=WIN;
+            sendMessage(playerOne.socket);
+            msg.state=LOOSE;
+            sendMessage(playerTwo.socket);
         }
         else {
-            msg.x=WIN;
-            sendMessage(playerTwo.sign);
-            sendMessage(playerTwo.sign);
-            msg.x=LOOSE;
-            sendMessage(playerOne.sign);
-            sendMessage(playerOne.sign);
+            msg.state=WIN;
+            sendMessage(playerTwo.socket);
+            msg.state=LOOSE;
+            sendMessage(playerOne.socket);
         }
-        sleep(3);
-        exit(0);
-    }*/
+    }
+    else{
+        if(i==playerOne.socket) sendMessage(playerTwo.socket);
+        else sendMessage(playerOne.socket);
+    }
 }
 
 void cleanUp(){
