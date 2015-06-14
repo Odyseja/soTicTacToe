@@ -9,7 +9,7 @@ char board[BORAD_SIZE][BORAD_SIZE];
 void printBoard(){
     for(int i=1; i<=size; i++){
         for(int j=1; j<size; j++){
-            printf("%c", board[i][j]);
+            printf("%c ", board[i][j]);
         }
         printf("\n");
     }
@@ -18,12 +18,13 @@ void printBoard(){
 void yourTurn(){
     while(true){
         printBoard();
-        printf("Give x, y: ");
+        printf("Give x y: ");
         scanf("%d %d", &(msg.x), &(msg.y));
 
-        while(board[msg.x][msg.y]!='#'){
-            printf("Wrong coords, try again\n");
-            scanf("%d %d", &(msg.x), &(msg.y));
+        while(board[msg.x][msg.y]!='_'){
+            printf("You cannot put it there\n");
+            scanf("%d", &(msg.x));
+            scanf("%d", &(msg.y));
         }
 
         board[msg.x][msg.y]=sign;
@@ -41,7 +42,7 @@ void yourTurn(){
         }
         else{
             system("clear");
-            board[msg.x][msg.y]='#';
+            board[msg.x][msg.y]='_';
         }
     }
 
@@ -133,7 +134,7 @@ int main(int argc, char** argv){
     }
 
     for(int i=1; i<=size; i++)
-        for(int j=1; j<=size; j++) board[i][j]='#';
+        for(int j=1; j<=size; j++) board[i][j]='_';
 
     printf("Give me your sign\n");
     scanf("%c", &(msg.sign));
@@ -141,23 +142,37 @@ int main(int argc, char** argv){
 
     char buff[100];
     struct message ms;
-    printf("Waiting for another player to log in\n");
     system("clear");
 
     FD_SET(SocketFD, &readset);
     while(true){
-        if(select(SocketFD+1, &readset, NULL, NULL, NULL) < 0) {
+        if(select(SocketFD+2, &readset, NULL, NULL, NULL) < 0) {
             perror("select");
             exit(1);
         }
         read(SocketFD, buff, 100);
         ms=*((struct message*)&buff);
+        /*if(ms.x==WIN){
+            printf("!!!!!!!!YOU WON!!!!!!!!!!\n");
+            printf("To return to main menu, press any key\n");
+            scanf(" %c", &sign);
+            cleanUp();
+            execl("./tictactoe", "tictactoe", NULL);
+
+        }
+        if(ms.x==LOOSE){
+            printf("!!!!!!!!YOU LOST!!!!!!!!!!\n");
+            printf("To return to main menu, press any key\n");
+            scanf(" %c", &sign);
+            cleanUp();
+            execl("./tictactoe", "tictactoe", NULL);
+        }*/
         if(ms.x!=-1){
             board[ms.x][ms.y]=ms.sign;
             system("clear");
+            printf("%d %d: %c\n", ms.x, ms.y, ms.sign);
         }
         printf("Your turn\n");
-        printf("%d %d: %c", ms.x, ms.y, ms.sign);
         yourTurn();
 
         FD_SET(SocketFD, &readset);

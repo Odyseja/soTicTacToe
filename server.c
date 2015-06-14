@@ -11,6 +11,55 @@ char ADDR[100];
 char board[BORAD_SIZE][BORAD_SIZE];
 int size=BORAD_SIZE;
 
+short int checkBoard(){
+    int count=1;
+    int newx=msg.x-1;
+    int newy=msg.y;
+    while(board[newx][newy]==board[msg.x][msg.y]){
+        newx--;
+        count++;
+    }
+    newx=msg.x+1;
+    while(board[newx][newy]==board[msg.x][msg.y]){
+        newx++;
+        count++;
+    }
+    if(count>=5) return true;
+
+    newx=msg.x;
+    newy=msg.y-1;
+    count=1;
+    while(board[newx][newy]==board[msg.x][msg.y]){
+        newy--;
+        count++;
+    }
+    newy=msg.y+1;
+    while(board[newx][newy]==board[msg.x][msg.y]){
+        newy++;
+        count++;
+    }
+    if(count>=5) return true;
+
+    newx=msg.x-1;
+    newy=msg.y-1;
+    count=1;
+    while(board[newx][newy]==board[msg.x][msg.y]){
+        newy--;
+        newx--;
+        count++;
+    }
+    newy=msg.y+1;
+    newx=msg.x+1;
+    while(board[newx][newy]==board[msg.x][msg.y]){
+        newy++;
+        newx++;
+        count++;
+    }
+    if(count>=5) return true;
+
+    return false;
+}
+
 void setUpRemote(){
     struct sockaddr_in stSockAddr;
     INETSocketFD = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -60,6 +109,7 @@ void setUpLocal(){
 void addNewClient(int SocketFD, int num){
     if(num==1){
         playerOne.socket = accept(SocketFD, NULL, NULL);
+        playerOne.sign=msg.sign;
         if(0 > playerOne.socket){
             perror("error accept failed");
             close(SocketFD);
@@ -113,8 +163,29 @@ void handleMessage(int i){
         printf("Client left\n");
         exit(0);
     }
+    board[msg.x][msg.y]=msg.sign;
     if(i==playerOne.socket)sendMessage(playerTwo.socket);
     else sendMessage(playerOne.socket);
+    /*if(checkBoard()==true){
+        if(msg.sign==playerOne.sign) {
+            msg.x=WIN;
+            sendMessage(playerOne.sign);
+            sendMessage(playerOne.sign);
+            msg.x=LOOSE;
+            sendMessage(playerTwo.sign);
+            sendMessage(playerTwo.sign);
+        }
+        else {
+            msg.x=WIN;
+            sendMessage(playerTwo.sign);
+            sendMessage(playerTwo.sign);
+            msg.x=LOOSE;
+            sendMessage(playerOne.sign);
+            sendMessage(playerOne.sign);
+        }
+        sleep(3);
+        exit(0);
+    }*/
 }
 
 void cleanUp(){
@@ -128,7 +199,6 @@ void cleanUp(){
     close(INETSocketFD);
     close(UNSocketFD);
 }
-
 void finish(int sig){
     printf("I've got signal\n");
     exit(0);
@@ -152,13 +222,14 @@ int main(int argc, char** argv){
     FD_SET(INETSocketFD, &readset);
     FD_SET(UNSocketFD, &readset);
     for(int i=1; i<=size; i++)
-        for(int j=1; j<=size; j++) board[i][j]='#';
+        for(int j=1; j<=size; j++) board[i][j]='_';
 
     addClients();
 
     srand(time(NULL));
     int start=rand()%2;
     msg.x=-1;
+    start=0;
     if(start==1){
         sendMessage(playerOne.socket);
     }
@@ -167,8 +238,11 @@ int main(int argc, char** argv){
     msg.x=0;
     msg.y=0;
 
+    FD_SET(playerOne.socket, &readset);
+    FD_SET(playerTwo.socket, &readset);
+
     while(true){
-        if (select(INETSocketFD+5, &readset, NULL, NULL, NULL) < 0) {
+        if(select(INETSocketFD+5, &readset, NULL, NULL, NULL) < 0) {
             perror("select");
             exit(1);
         }

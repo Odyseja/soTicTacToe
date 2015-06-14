@@ -26,6 +26,7 @@ void connectToGame(int isLocal){
 
 void newGame(){
     pid_t serverPid;
+    unlink(ADDR);
     char PORT[100];
     printf("Give me port: ");
     scanf("%s", PORT);
@@ -44,8 +45,6 @@ void newGame(){
 
 }
 
-
-
 int main(){
     int get;
     while(true){
@@ -55,7 +54,7 @@ int main(){
 
         printf ("lines %d\n", w.ws_row);
         printf ("columns %d\n", w.ws_col);*/
-        printf("Welcome to the Tic-tac-toe game!\n");
+        printf("Welcome to the soTicTacToe game!\n");
         printf("Choose\n");
         printf("1 - to start new game\n");
         printf("2 - to connect to the game\n");

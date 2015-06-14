@@ -13,6 +13,8 @@
 
 #define NAME_LEN 100
 #define BORAD_SIZE 200
+#define WIN -2
+#define LOOSE -3
 
 #define true 1
 #define false 0
