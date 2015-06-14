@@ -9,8 +9,10 @@
 #include <pthread.h>
 #include <signal.h>
 #include <sys/un.h>
+#include <sys/ioctl.h>
 
 #define NAME_LEN 100
+#define BORAD_SIZE 200
 
 #define true 1
 #define false 0

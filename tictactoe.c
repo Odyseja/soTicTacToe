@@ -50,6 +50,11 @@ int main(){
     int get;
     while(true){
         system("clear");
+        /*struct winsize w;
+        ioctl(0, TIOCGWINSZ, &w);
+
+        printf ("lines %d\n", w.ws_row);
+        printf ("columns %d\n", w.ws_col);*/
         printf("Welcome to the Tic-tac-toe game!\n");
         printf("Choose\n");
         printf("1 - to start new game\n");

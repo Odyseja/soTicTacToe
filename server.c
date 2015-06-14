@@ -1,4 +1,3 @@
- /* Server code in C */
 #include "socket.h"
 
 int INETSocketFD;
@@ -9,6 +8,8 @@ fd_set readset;
 struct message msg;
 int PORT;
 char ADDR[100];
+char board[BORAD_SIZE][BORAD_SIZE];
+int size=BORAD_SIZE;
 
 void setUpRemote(){
     struct sockaddr_in stSockAddr;
@@ -150,6 +151,8 @@ int main(int argc, char** argv){
     FD_ZERO(&readset);
     FD_SET(INETSocketFD, &readset);
     FD_SET(UNSocketFD, &readset);
+    for(int i=1; i<=size; i++)
+        for(int j=1; j<=size; j++) board[i][j]='#';
 
     addClients();
 
