@@ -156,7 +156,7 @@ void sendMessage(int socket){
 
 void handleMessage(int i){
     if(read(i, (char*)&msg, sizeof(msg))<=0) return;
-    if(msg.x<=0){
+    if(msg.x==-1 || msg.state==LEFT){
         exit(0);
     }
     board[msg.x][msg.y]=msg.sign;
@@ -183,21 +183,26 @@ void handleMessage(int i){
     }
     else{
         if(i==playerOne.socket) {
-            strcpy(playerOne.name,msg.name);
             sendMessage(playerTwo.socket);
         }
         else{
-            strcpy(playerTwo.name,msg.name);
             sendMessage(playerOne.socket);
         }
     }
 }
 
 void cleanUp(){
-    printf("Shutting down...\n");
-    unlink(ADDR);
+    printf("\nShutting down...\n");
+    msg.state=LEFT;
+    msg.x=-1;
+    sendMessage(playerOne.socket);
+    msg.state=LEFT;
+    msg.x=-1;
+    sendMessage(playerTwo.socket);
+
     shutdown(playerOne.socket, SHUT_RDWR);
     shutdown(playerTwo.socket, SHUT_RDWR);
+    unlink(ADDR);
 
     close(playerTwo.socket);
     close(playerOne.socket);
@@ -207,7 +212,6 @@ void cleanUp(){
 }
 
 void finish(int sig){
-    printf("I've got signal\n");
     exit(0);
 }
 

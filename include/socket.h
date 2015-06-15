@@ -17,6 +17,7 @@
 #define WIN -2
 #define LOOSE -3
 #define GOON 0
+#define LEFT -4
 
 #define KRED  "\x1B[31m"
 #define KGRN  "\x1B[32m"
