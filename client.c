@@ -8,6 +8,7 @@ int sizey=30;
 char board[BORAD_SIZE][BORAD_SIZE];
 char win[BORAD_SIZE][BORAD_SIZE];
 char* ADDR="./serv";
+char name[100];
 
 void printBoard(){
     for(int i=1; i<=sizex; i++){
@@ -70,32 +71,36 @@ void checkBoard(){
 }
 
 void yourTurn(){
+
     while(true){
+        system("clear");
+        printf("%s's turn\n", name);
         printBoard();
         printf("Give x y: ");
-        scanf("%d %d", &(msg.x), &(msg.y));
+        while(scanf("%d %d", &(msg.x), &(msg.y))<2);
+        system("clear");
+        strcpy(msg.name,name);
 
         while(board[msg.x][msg.y]!='_' || msg.x<1 || msg.x>sizex || msg.y<1 || msg.y>sizey){
             printf("You cannot put it there\n");
-            scanf("%d", &(msg.x));
-            scanf("%d", &(msg.y));
+            while(scanf("%d %d", &(msg.x), &(msg.y))<2);
         }
-
+        system("clear");
         board[msg.x][msg.y]=sign;
         msg.sign=sign;
-
+        printf("%s's turn\n", name);
         printBoard();
         char prompt;
         printf("Do you confirm your choice? [y/n]\n");
         scanf(" %c", &prompt);
+        system("clear");
         if(prompt=='y'){
-            system("clear");
+            //system("clear");
             printf("Enemy's turn\n");
             printBoard();
             break;
         }
         else{
-            system("clear");
             board[msg.x][msg.y]='_';
         }
     }
@@ -177,7 +182,7 @@ void endGame(struct message ms){
     msg=ms;
     if(ms.state==WIN){
         system("clear");
-        printf("!!!!!!!!YOU WON!!!!!!!!!!\n");
+        printf("!!!!!!!!%s WON!!!!!!!!!!\n", msg.name);
         checkBoard();
         printBoard();
         printf("To return to main menu, press any key and enter\n");
@@ -188,7 +193,7 @@ void endGame(struct message ms){
     }
     if(ms.state==LOOSE){
         system("clear");
-        printf("!!!!!!!!YOU LOST!!!!!!!!!!\n");
+        printf("!!!!!!!!%s WON!!!!!!!!!!\n", msg.name);
         board[ms.x][ms.y]=ms.sign;
         checkBoard();
         printBoard();
@@ -204,18 +209,22 @@ int main(int argc, char** argv){
     signal(SIGINT, finish);
     FD_ZERO(&readset);
 
-    if(strcmp(argv[2], "remote")==0 ){
-        connectRemote(atoi(argv[3]), argv[4]);
+    if(strcmp(argv[1], "remote")==0 ){
+        strcpy(name, argv[4]);
+        msg.sign=argv[5][0];
+        connectRemote(atoi(argv[2]), argv[3]);
     }
     else{
-        connectLocal(argv[3]);
+        strcpy(name, argv[3]);
+        msg.sign=argv[4][0];
+        connectLocal(argv[2]);
     }
 
     for(int i=1; i<=sizex; i++)
         for(int j=1; j<=sizey; j++) board[i][j]='_';
 
-    printf("Give me your sign\n");
-    scanf("%c", &(msg.sign));
+    //printf("Give me your sign\n");
+    //scanf("%c", &(msg.sign));
     sign=msg.sign;
 
     char buff[100];
@@ -231,10 +240,12 @@ int main(int argc, char** argv){
         read(SocketFD, buff, 100);
         ms=*((struct message*)&buff);
         if(ms.state!=0) endGame(ms);
-        if(ms.x!=-1){
+
+        if(ms.x>0){
             board[ms.x][ms.y]=ms.sign;
             system("clear");
             printf("%d %d: %c\n", ms.x, ms.y, ms.sign);
+            msg=ms;
         }
         if(ms.x==-1 || ms.x>0){
             printf("Your turn\n");

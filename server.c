@@ -142,20 +142,25 @@ void sendMessage(int socket){
 
 void handleMessage(int i){
     if(read(i, (char*)&msg, sizeof(msg))<=0) return;
-    if(msg.x==-1){
-        printf("Client left\n");
+    if(msg.x<=0){
         exit(0);
     }
     board[msg.x][msg.y]=msg.sign;
-
     if(checkBoard()==true){
         if(msg.sign==playerOne.sign) {
+            FILE* fd=fopen("results.txt", "a");
+            fprintf(fd, "Winner: %s\tLooser: %s\n", playerOne.name, playerTwo.name);
+            fclose(fd);
             msg.state=WIN;
             sendMessage(playerOne.socket);
             msg.state=LOOSE;
             sendMessage(playerTwo.socket);
         }
         else {
+            FILE* fd=fopen("results.txt", "a");
+            fprintf(fd, "Winner: %s\tLooser: %s\n", playerTwo.name, playerOne.name);
+            fclose(fd);
+
             msg.state=WIN;
             sendMessage(playerTwo.socket);
             msg.state=LOOSE;
@@ -163,8 +168,14 @@ void handleMessage(int i){
         }
     }
     else{
-        if(i==playerOne.socket) sendMessage(playerTwo.socket);
-        else sendMessage(playerOne.socket);
+        if(i==playerOne.socket) {
+            strcpy(playerOne.name,msg.name);
+            sendMessage(playerTwo.socket);
+        }
+        else{
+            strcpy(playerTwo.name,msg.name);
+            sendMessage(playerOne.socket);
+        }
     }
 }
 
@@ -178,6 +189,7 @@ void cleanUp(){
     close(playerOne.socket);
     close(INETSocketFD);
     close(UNSocketFD);
+    exit(1);
 }
 
 void finish(int sig){
