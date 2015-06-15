@@ -1,4 +1,5 @@
 #include "socket.h"
+
 char* ADDR="./serv";
 
 void connectToGame(int isLocal){
@@ -21,7 +22,6 @@ void connectToGame(int isLocal){
 
         execl("./client", "client", "remote", PORT, ip, NULL);
     }
-
 }
 
 void newGame(){
@@ -39,7 +39,6 @@ void newGame(){
         execl("./server", "server", PORT, ADDR, NULL);
     }
     else{
-        printf("...\n");
         connectToGame(true);
     }
 
@@ -54,7 +53,7 @@ int main(){
 
         printf ("lines %d\n", w.ws_row);
         printf ("columns %d\n", w.ws_col);*/
-        printf("Welcome to the soTicTacToe game!\n");
+        printf(KGRN "Welcome to the soTicTacToe game!\n" RESET);
         printf("Choose\n");
         printf("1 - to start new game\n");
         printf("2 - to connect to the game\n");

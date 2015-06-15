@@ -25,9 +25,6 @@ $(CL): $(CL).c
 	$(CC) $^ -o $@ $(CFLAGS)
 
 
-
-
-
 .PHONY: clean
 clean:
-	rm $(SER) $(CL)
+	rm $(SER) $(CL) $(TIC)

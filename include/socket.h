@@ -18,6 +18,10 @@
 #define LOOSE -3
 #define GOON 0
 
+#define KRED  "\x1B[31m"
+#define KGRN  "\x1B[32m"
+#define RESET "\033[0m"
+
 #define true 1
 #define false 0
 

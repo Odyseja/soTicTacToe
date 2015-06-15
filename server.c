@@ -7,54 +7,37 @@ struct player playerTwo;
 fd_set readset;
 struct message msg;
 int PORT;
-char ADDR[100];
 char board[BORAD_SIZE][BORAD_SIZE];
-int size=BORAD_SIZE;
+int sizex=BORAD_SIZE;
+int sizey=BORAD_SIZE;
+char ADDR[100];
+
+int checkOneSide(int changex, int changey, int count, int newx, int newy){
+    while(board[newx][newy]==board[msg.x][msg.y]){
+        newx+=changex;
+        newy+=changey;
+        count++;
+    }
+    return count;
+}
 
 short int checkBoard(){
     int count=1;
-    int newx=msg.x-1;
-    int newy=msg.y;
-    while(board[newx][newy]==board[msg.x][msg.y]){
-        newx--;
-        count++;
-    }
-    newx=msg.x+1;
-    while(board[newx][newy]==board[msg.x][msg.y]){
-        newx++;
-        count++;
-    }
+
+    count=checkOneSide(-1, 0, 1, msg.x-1, msg.y);
+    count=checkOneSide(1, 0, count, msg.x+1, msg.y);
     if(count>=5) return true;
 
-    newx=msg.x;
-    newy=msg.y-1;
-    count=1;
-    while(board[newx][newy]==board[msg.x][msg.y]){
-        newy--;
-        count++;
-    }
-    newy=msg.y+1;
-    while(board[newx][newy]==board[msg.x][msg.y]){
-        newy++;
-        count++;
-    }
+    count=checkOneSide(0, -1, 1, msg.x, msg.y-1);
+    count=checkOneSide(0, 1, count, msg.x, msg.y+1);
     if(count>=5) return true;
 
-    newx=msg.x-1;
-    newy=msg.y-1;
-    count=1;
-    while(board[newx][newy]==board[msg.x][msg.y]){
-        newy--;
-        newx--;
-        count++;
-    }
-    newy=msg.y+1;
-    newx=msg.x+1;
-    while(board[newx][newy]==board[msg.x][msg.y]){
-        newy++;
-        newx++;
-        count++;
-    }
+    count=checkOneSide(-1, -1, 1, msg.x-1, msg.y-1);
+    count=checkOneSide(1, 1, count, msg.x+1, msg.y+1);
+    if(count>=5) return true;
+
+    count=checkOneSide(+1, -1, 1, msg.x+1, msg.y-1);
+    count=checkOneSide(-1, +1, count, msg.x-1, msg.y+1);
     if(count>=5) return true;
 
     return false;
@@ -196,6 +179,7 @@ void cleanUp(){
     close(INETSocketFD);
     close(UNSocketFD);
 }
+
 void finish(int sig){
     printf("I've got signal\n");
     exit(0);
@@ -212,14 +196,15 @@ int main(int argc, char** argv){
     PORT=atoi(argv[1]);
     strcpy(ADDR,argv[2]);
 
-    setUpRemote();
     setUpLocal();
+    setUpRemote();
 
     FD_ZERO(&readset);
     FD_SET(INETSocketFD, &readset);
     FD_SET(UNSocketFD, &readset);
-    for(int i=1; i<=size; i++)
-        for(int j=1; j<=size; j++) board[i][j]='_';
+
+    for(int i=1; i<=sizex; i++)
+        for(int j=1; j<=sizey; j++) board[i][j]='_';
 
     addClients();
 
