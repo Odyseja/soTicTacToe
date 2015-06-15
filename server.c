@@ -98,6 +98,11 @@ void addNewClient(int SocketFD, int num){
             close(SocketFD);
             exit(EXIT_FAILURE);
         }
+        //Set the size of playerOne's terminal
+        read(playerOne.socket, (char*)&msg, sizeof(msg));
+        strcpy(playerOne.name,msg.name);
+        sizex=msg.x;
+        sizey=msg.y/2;
         FD_SET(playerOne.socket, &readset);
     }
     else{
@@ -107,9 +112,18 @@ void addNewClient(int SocketFD, int num){
             close(SocketFD);
             exit(EXIT_FAILURE);
         }
+        //Set the size of playerTwo's terminal
+        read(playerTwo.socket, (char*)&msg, sizeof(msg));
+        strcpy(playerTwo.name,msg.name);
+        if(msg.x<sizex) sizex=msg.x;
+        if(msg.y/2<sizey) sizey=msg.y/2;
+        sizex-=3;
+        msg.x=sizex;
+        msg.y=sizey;
+        write(playerOne.socket, (char*)&msg, sizeof(msg) );
+        write(playerTwo.socket, (char*)&msg, sizeof(msg) );
         FD_SET(playerTwo.socket, &readset);
     }
-
 }
 
 void addClients(){

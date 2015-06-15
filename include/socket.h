@@ -30,7 +30,7 @@ struct message{
     int y;
     char sign;
     short int state;
-    char name[100];
+    char name[NAME_LEN];
 };
 
 struct player{

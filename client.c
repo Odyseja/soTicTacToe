@@ -226,11 +226,22 @@ int main(int argc, char** argv){
             pid=atoi(argv[5]);
         }
     }
+    sign=msg.sign;
+    //Set the board size
+    struct winsize w;
+    ioctl(0, TIOCGWINSZ, &w);
+
+    msg.x=w.ws_row;
+    msg.y=w.ws_col;
+    write(SocketFD, (char*)&msg, sizeof(msg));
+    read(SocketFD, (char*)&msg, sizeof(msg));
+
+    sizex=msg.x;
+    sizey=msg.y;
 
     for(int i=1; i<=sizex; i++)
         for(int j=1; j<=sizey; j++) board[i][j]='_';
 
-    sign=msg.sign;
 
     char buff[100];
     struct message ms;

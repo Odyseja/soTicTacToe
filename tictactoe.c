@@ -13,7 +13,7 @@ void connectToGame(int isLocal){
     system("clear");
 
     if(isLocal==true){
-         printf("What's your name?: ");
+        printf("What's your name?: ");
         scanf("%s", name);
         execl("./client", "client", "local", ADDR, name, "o", NULL);
     }
@@ -110,11 +110,6 @@ int main(){
     int get;
     while(true){
         system("clear");
-        /*struct winsize w;
-        ioctl(0, TIOCGWINSZ, &w);
-
-        printf ("lines %d\n", w.ws_row);
-        printf ("columns %d\n", w.ws_col);*/
         printf(KGRN "Welcome to the soTicTacToe game!\n" RESET);
         printf("Choose\n");
         printf("1 - to start new online game\n");
