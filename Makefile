@@ -27,4 +27,4 @@ $(CL): $(CL).c
 
 .PHONY: clean
 clean:
-	rm $(SER) $(CL) $(TIC)
+	rm $(SER) $(CL) $(TIC) results.txt

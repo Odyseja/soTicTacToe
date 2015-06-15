@@ -8,7 +8,9 @@ int sizey=30;
 char board[BORAD_SIZE][BORAD_SIZE];
 char win[BORAD_SIZE][BORAD_SIZE];
 char* ADDR="./serv";
+short int flag;
 char name[100];
+pid_t pid;
 
 void printBoard(){
     for(int i=1; i<=sizex; i++){
@@ -71,7 +73,6 @@ void checkBoard(){
 }
 
 void yourTurn(){
-
     while(true){
         system("clear");
         printf("%s's turn\n", name);
@@ -83,6 +84,8 @@ void yourTurn(){
 
         while(board[msg.x][msg.y]!='_' || msg.x<1 || msg.x>sizex || msg.y<1 || msg.y>sizey){
             printf("You cannot put it there\n");
+            printBoard();
+            printf("Give x y: ");
             while(scanf("%d %d", &(msg.x), &(msg.y))<2);
         }
         system("clear");
@@ -95,7 +98,6 @@ void yourTurn(){
         scanf(" %c", &prompt);
         system("clear");
         if(prompt=='y'){
-            //system("clear");
             printf("Enemy's turn\n");
             printBoard();
             break;
@@ -180,6 +182,7 @@ void finish(int sig){
 
 void endGame(struct message ms){
     msg=ms;
+    if(flag==1) kill(SIGINT, pid);
     if(ms.state==WIN){
         system("clear");
         printf("!!!!!!!!%s WON!!!!!!!!!!\n", msg.name);
@@ -218,19 +221,22 @@ int main(int argc, char** argv){
         strcpy(name, argv[3]);
         msg.sign=argv[4][0];
         connectLocal(argv[2]);
+        if(argc==6){
+            flag=1;
+            pid=atoi(argv[5]);
+        }
     }
 
     for(int i=1; i<=sizex; i++)
         for(int j=1; j<=sizey; j++) board[i][j]='_';
 
-    //printf("Give me your sign\n");
-    //scanf("%c", &(msg.sign));
     sign=msg.sign;
 
     char buff[100];
     struct message ms;
     system("clear");
-
+    printf("Waiting for opponent, to end the game press ctrl+c\n");
+    printBoard();
     FD_SET(SocketFD, &readset);
     while(true){
         if(select(SocketFD+2, &readset, NULL, NULL, NULL) < 0) {
@@ -239,7 +245,6 @@ int main(int argc, char** argv){
         }
         read(SocketFD, buff, 100);
         ms=*((struct message*)&buff);
-        if(ms.state!=0) endGame(ms);
 
         if(ms.x>0){
             board[ms.x][ms.y]=ms.sign;
@@ -247,6 +252,7 @@ int main(int argc, char** argv){
             printf("%d %d: %c\n", ms.x, ms.y, ms.sign);
             msg=ms;
         }
+        if(ms.state!=0) endGame(ms);
         if(ms.x==-1 || ms.x>0){
             printf("Your turn\n");
             yourTurn();

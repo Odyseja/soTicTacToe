@@ -90,17 +90,19 @@ void newLocalGame(){
     scanf("%s", name2);
 
     pid_t pid=fork();
-
+    char buff[100];
 
     if(pid<0){
         perror("fork");
         exit(1);
     }
     else if(pid==0){
-        execl("./client", "client", "local", ADDR, name1, "o" ,NULL);
+        sprintf(buff, "%ud", getpid());
+        execl("./client", "client", "local", ADDR, name1, "o", buff, NULL);
     }
     else{
-        execl("./client", "client", "local", ADDR, name2, "x", NULL);
+        sprintf(buff, "%ud", pid);
+        execl("./client", "client", "local", ADDR, name2, "x", buff, NULL);
     }
 }
 
