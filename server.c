@@ -211,7 +211,7 @@ int main(int argc, char** argv){
     srand(time(NULL));
     int start=rand()%2;
     msg.x=-1;
-    start=0;
+
     if(start==1){
         sendMessage(playerOne.socket);
     }

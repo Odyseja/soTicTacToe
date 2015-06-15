@@ -34,6 +34,7 @@ int checkOneSide(int changex, int changey, int count, int newx, int newy, int fl
 void checkBoard(){
     int count=1;
 
+    win[msg.x][msg.y]=1;
     count=checkOneSide(-1, 0, 1, msg.x-1, msg.y, 0);
     count=checkOneSide(1, 0, count, msg.x+1, msg.y, 0);
     if(count>=5) {
@@ -74,7 +75,7 @@ void yourTurn(){
         printf("Give x y: ");
         scanf("%d %d", &(msg.x), &(msg.y));
 
-        while(board[msg.x][msg.y]!='_'){
+        while(board[msg.x][msg.y]!='_' || msg.x<1 || msg.x>sizex || msg.y<1 || msg.y>sizey){
             printf("You cannot put it there\n");
             scanf("%d", &(msg.x));
             scanf("%d", &(msg.y));
@@ -173,11 +174,12 @@ void finish(int sig){
 }
 
 void endGame(struct message ms){
+    msg=ms;
     if(ms.state==WIN){
         system("clear");
+        printf("!!!!!!!!YOU WON!!!!!!!!!!\n");
         checkBoard();
         printBoard();
-        printf("!!!!!!!!YOU WON!!!!!!!!!!\n");
         printf("To return to main menu, press any key and enter\n");
         scanf(" %c", &sign);
         cleanUp();
@@ -186,10 +188,10 @@ void endGame(struct message ms){
     }
     if(ms.state==LOOSE){
         system("clear");
-        checkBoard();
-        board[ms.x][ms.y]=ms.sign;
-        printBoard();
         printf("!!!!!!!!YOU LOST!!!!!!!!!!\n");
+        board[ms.x][ms.y]=ms.sign;
+        checkBoard();
+        printBoard();
         printf("To return to main menu, press any key and enter\n");
         scanf(" %c", &sign);
         cleanUp();
