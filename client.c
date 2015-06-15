@@ -183,6 +183,10 @@ void finish(int sig){
 void endGame(struct message ms){
     msg=ms;
     if(flag==1) kill(SIGINT, pid);
+    if(ms.state==LEFT){
+        printf("Your opponent left\n");
+        exit(0);
+    }
     if(ms.state==WIN){
         system("clear");
         printf("!!!!!!!!%s WON!!!!!!!!!!\n", msg.name);
