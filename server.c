@@ -102,7 +102,7 @@ void addNewClient(int SocketFD, int num){
         read(playerOne.socket, (char*)&msg, sizeof(msg));
         strcpy(playerOne.name,msg.name);
         sizex=msg.x;
-        sizey=msg.y/2;
+        sizey=msg.y/3;
         FD_SET(playerOne.socket, &readset);
     }
     else{
@@ -116,8 +116,11 @@ void addNewClient(int SocketFD, int num){
         read(playerTwo.socket, (char*)&msg, sizeof(msg));
         strcpy(playerTwo.name,msg.name);
         if(msg.x<sizex) sizex=msg.x;
-        if(msg.y/2<sizey) sizey=msg.y/2;
-        sizex-=3;
+        if(msg.y/3<sizey) sizey=msg.y/3;
+        sizex-=5;
+        sizey-=5;
+        if(sizex>99) sizex=99;
+        if(sizey>99) sizey=99;
         msg.x=sizex;
         msg.y=sizey;
         write(playerOne.socket, (char*)&msg, sizeof(msg) );
@@ -156,14 +159,7 @@ void sendMessage(int socket){
 
 void handleMessage(int i){
     if(read(i, (char*)&msg, sizeof(msg))<=0) return;
-    if(msg.x<=0 || msg.state==LEFT){
-        msg.state=LEFT;
-        if(playerOne.sign!=msg.sign) {
-            sendMessage(playerOne.socket);
-        }
-        else {
-            sendMessage(playerTwo.socket);
-        }
+    if(msg.x==-1 || msg.state==LEFT){
         exit(0);
     }
     board[msg.x][msg.y]=msg.sign;
@@ -199,8 +195,15 @@ void handleMessage(int i){
 }
 
 void cleanUp(){
-    printf("\nShutting server down...\n");
+    printf("\nShutting down...\n");
+    msg.state=LEFT;
+    msg.x=-1;
+    sendMessage(playerOne.socket);
+    msg.state=LEFT;
+    msg.x=-1;
+    sendMessage(playerTwo.socket);
     unlink(ADDR);
+
     shutdown(playerOne.socket, SHUT_RDWR);
     shutdown(playerTwo.socket, SHUT_RDWR);
 

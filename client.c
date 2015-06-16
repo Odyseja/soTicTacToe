@@ -13,10 +13,18 @@ char name[100];
 pid_t pid;
 
 void printBoard(){
+    printf("     ");
+    for(int i=1; i<sizey; i++){
+        if(i<9)printf("%d  ", i);
+        else printf("%d ", i);
+    }
+    printf("\n");
     for(int i=1; i<=sizex; i++){
+        if(i<10) printf("%d    ", i);
+        else printf("%d   ", i);
         for(int j=1; j<sizey; j++){
-            if(win[i][j]==0) printf("%c ", board[i][j]);
-            else printf(KRED "%c " RESET, board[i][j]);
+            if(win[i][j]==0) printf("%c  ", board[i][j]);
+            else printf(KRED "%c  " RESET, board[i][j]);
         }
         printf("\n");
     }
@@ -78,15 +86,22 @@ void yourTurn(){
         printf("%s's turn\n", name);
         printBoard();
         printf("Give x y: ");
-        while(scanf("%d %d", &(msg.x), &(msg.y))<2);
+        char ch;
+        while(true){
+            if(scanf("%d %d", &(msg.x), &(msg.y))==2) break;
+            while ((ch = getchar()) != '\n' && ch != EOF);
+        }
         system("clear");
         strcpy(msg.name,name);
 
-        while(board[msg.x][msg.y]!='_' || msg.x<1 || msg.x>sizex || msg.y<1 || msg.y>sizey){
+        while( msg.x<1 || msg.x>sizex || msg.y<1 || msg.y>sizey || board[msg.x][msg.y]!='_'){
             printf("You cannot put it there\n");
             printBoard();
             printf("Give x y: ");
-            while(scanf("%d %d", &(msg.x), &(msg.y))<2);
+            while(true){
+                if(scanf("%d %d", &(msg.x), &(msg.y))==2) break;
+                while ((ch = getchar()) != '\n' && ch != EOF);
+            }
         }
         system("clear");
         board[msg.x][msg.y]=sign;
@@ -169,25 +184,28 @@ void connectLocal(char* addr){
 }
 
 void cleanUp(){
-    msg.x=-1;
-    write(SocketFD, (char*) &msg, sizeof(msg));
     (void) shutdown(SocketFD, SHUT_RDWR);
     close(SocketFD);
     unlink(ADDR);
 }
 
 void finish(int sig){
+    msg.x=-1;
+    msg.state=LEFT;
+    msg.sign=sign;
+    write(SocketFD, (char*)&msg, sizeof(msg));
+    read(SocketFD, (char*)&(msg), sizeof(msg));
     exit(0);
 }
 
-void endGame(struct message ms){
-    msg=ms;
+void endGame(){
+    system("clear");
     if(flag==1) kill(SIGINT, pid);
-    if(ms.state==LEFT){
+    if(msg.state==LEFT){
         printf("Your opponent left\n");
         exit(0);
     }
-    if(ms.state==WIN){
+    if(msg.state==WIN){
         system("clear");
         printf("!!!!!!!!%s WON!!!!!!!!!!\n", msg.name);
         checkBoard();
@@ -198,10 +216,10 @@ void endGame(struct message ms){
         execl("./tictactoe", "tictactoe", NULL);
 
     }
-    if(ms.state==LOOSE){
+    if(msg.state==LOOSE){
         system("clear");
         printf("!!!!!!!!%s WON!!!!!!!!!!\n", msg.name);
-        board[ms.x][ms.y]=ms.sign;
+        board[msg.x][msg.y]=msg.sign;
         checkBoard();
         printBoard();
         printf("To return to main menu, press any key and enter\n");
@@ -209,6 +227,7 @@ void endGame(struct message ms){
         cleanUp();
         execl("./tictactoe", "tictactoe", NULL);
     }
+    exit(0);
 }
 
 int main(int argc, char** argv){
@@ -246,9 +265,6 @@ int main(int argc, char** argv){
     for(int i=1; i<=sizex; i++)
         for(int j=1; j<=sizey; j++) board[i][j]='_';
 
-
-    char buff[100];
-    struct message ms;
     system("clear");
     printf("Waiting for opponent, to end the game press ctrl+c\n");
     printBoard();
@@ -258,17 +274,15 @@ int main(int argc, char** argv){
             perror("select");
             exit(1);
         }
-        read(SocketFD, buff, 100);
-        ms=*((struct message*)&buff);
+        read(SocketFD, (char*)&msg, sizeof(msg));
 
-        if(ms.x>0){
-            board[ms.x][ms.y]=ms.sign;
+        if(msg.x>0){
+            board[msg.x][msg.y]=msg.sign;
             system("clear");
-            printf("%d %d: %c\n", ms.x, ms.y, ms.sign);
-            msg=ms;
+            printf("%d %d: %c\n", msg.x, msg.y, msg.sign);
         }
-        if(ms.state!=0) endGame(ms);
-        if(ms.x==-1 || ms.x>0){
+        if(msg.state!=0) endGame();
+        if(msg.x==-1 || msg.x>0){
             printf("Your turn\n");
             yourTurn();
         }
