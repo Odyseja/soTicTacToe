@@ -10,6 +10,7 @@ char win[BORAD_SIZE][BORAD_SIZE];
 char* ADDR="./serv";
 short int flag;
 char name[100];
+char name2[100];
 pid_t pid;
 
 void printBoard(){
@@ -207,6 +208,11 @@ void endGame(){
     }
     if(msg.state==WIN){
         system("clear");
+
+        FILE* fd=fopen("results.txt", "a");
+        fprintf(fd, "Player: %s\tWinner: %s\tLooser: %s\n", name, name, name2);
+        fclose(fd);
+
         printf("!!!!!!!!%s WON!!!!!!!!!!\n", msg.name);
         checkBoard();
         printBoard();
@@ -218,6 +224,11 @@ void endGame(){
     }
     if(msg.state==LOOSE){
         system("clear");
+
+        FILE* fd=fopen("results.txt", "a");
+        fprintf(fd, "Player: %s\tWinner: %s\tLooser: %s\n", name, name2, name);
+        fclose(fd);
+
         printf("!!!!!!!!%s WON!!!!!!!!!!\n", msg.name);
         board[msg.x][msg.y]=msg.sign;
         checkBoard();
@@ -282,6 +293,7 @@ int main(int argc, char** argv){
             printf("%d %d: %c\n", msg.x, msg.y, msg.sign);
         }
         if(msg.state!=0) endGame();
+        strcpy(name2, msg.name);
         if(msg.x==-1 || msg.x>0){
             printf("Your turn\n");
             yourTurn();

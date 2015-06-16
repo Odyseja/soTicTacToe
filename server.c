@@ -165,24 +165,18 @@ void handleMessage(int i){
     board[msg.x][msg.y]=msg.sign;
     if(checkBoard()==true){
         if(msg.sign==playerOne.sign) {
-            FILE* fd=fopen("results.txt", "a");
-            fprintf(fd, "Winner: %s\tLooser: %s\n", playerOne.name, playerTwo.name);
-            fclose(fd);
             msg.state=WIN;
             sendMessage(playerOne.socket);
             msg.state=LOOSE;
             sendMessage(playerTwo.socket);
         }
         else {
-            FILE* fd=fopen("results.txt", "a");
-            fprintf(fd, "Winner: %s\tLooser: %s\n", playerTwo.name, playerOne.name);
-            fclose(fd);
-
             msg.state=WIN;
             sendMessage(playerTwo.socket);
             msg.state=LOOSE;
             sendMessage(playerOne.socket);
         }
+        exit(0);
     }
     else{
         if(i==playerOne.socket) {
