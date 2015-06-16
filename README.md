@@ -6,3 +6,7 @@ make all
 
 Run:
 ./tictactoe
+
+Link opening documentation in readable way:
+
+http://htmlpreview.github.io/?https://github.com/Odyseja/soTicTacToe/blob/master/Dokumentacja.html
