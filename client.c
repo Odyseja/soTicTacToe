@@ -210,7 +210,7 @@ void endGame(){
         system("clear");
 
         FILE* fd=fopen("results.txt", "a");
-        fprintf(fd, "Player: %s\tWinner: %s\tLooser: %s\n", name, name, name2);
+        fprintf(fd, "Player: %s\tWinner: %s\tLoser: %s\n", name, name, name2);
         fclose(fd);
 
         printf("!!!!!!!!%s WON!!!!!!!!!!\n", msg.name);
@@ -226,7 +226,7 @@ void endGame(){
         system("clear");
 
         FILE* fd=fopen("results.txt", "a");
-        fprintf(fd, "Player: %s\tWinner: %s\tLooser: %s\n", name, name2, name);
+        fprintf(fd, "Player: %s\tWinner: %s\tLoser: %s\n", name, name2, name);
         fclose(fd);
 
         printf("!!!!!!!!%s WON!!!!!!!!!!\n", msg.name);
