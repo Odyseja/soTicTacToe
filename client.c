@@ -86,9 +86,9 @@ void yourTurn(){
         system("clear");
         printf("%s's turn\n", name);
         printBoard();
-        printf("Give x y: ");
         char ch;
         while(true){
+            printf("Give y x: ");
             if(scanf("%d %d", &(msg.x), &(msg.y))==2) break;
             while ((ch = getchar()) != '\n' && ch != EOF);
         }
@@ -96,10 +96,11 @@ void yourTurn(){
         strcpy(msg.name,name);
 
         while( msg.x<1 || msg.x>sizex || msg.y<1 || msg.y>sizey || board[msg.x][msg.y]!='_'){
-            printf("You cannot put it there\n");
+            system("clear");
+            printf("Choose another place\n");
             printBoard();
-            printf("Give x y: ");
             while(true){
+                printf("Give y x: ");
                 if(scanf("%d %d", &(msg.x), &(msg.y))==2) break;
                 while ((ch = getchar()) != '\n' && ch != EOF);
             }
@@ -181,6 +182,7 @@ void connectLocal(char* addr){
         exit(EXIT_FAILURE);
     }
     printf("logged in to the server\n");
+    printf("Waiting for opponent, to end the game press ctrl+c\n");
 
 }
 
@@ -222,7 +224,7 @@ void endGame(){
         execl("./tictactoe", "tictactoe", NULL);
 
     }
-    if(msg.state==LOOSE){
+    if(msg.state==LOSE){
         system("clear");
 
         FILE* fd=fopen("results.txt", "a");
@@ -289,9 +291,8 @@ int main(int argc, char** argv){
 
         if(msg.x>0){
             board[msg.x][msg.y]=msg.sign;
-            system("clear");
-            printf("%d %d: %c\n", msg.x, msg.y, msg.sign);
         }
+        system("clear");
         if(msg.state!=0) endGame();
         strcpy(name2, msg.name);
         if(msg.x==-1 || msg.x>0){

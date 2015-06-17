@@ -167,13 +167,13 @@ void handleMessage(int i){
         if(msg.sign==playerOne.sign) {
             msg.state=WIN;
             sendMessage(playerOne.socket);
-            msg.state=LOOSE;
+            msg.state=LOSE;
             sendMessage(playerTwo.socket);
         }
         else {
             msg.state=WIN;
             sendMessage(playerTwo.socket);
-            msg.state=LOOSE;
+            msg.state=LOSE;
             sendMessage(playerOne.socket);
         }
         exit(0);
@@ -249,14 +249,34 @@ int main(int argc, char** argv){
 
     FD_SET(playerOne.socket, &readset);
     FD_SET(playerTwo.socket, &readset);
+    FD_SET(INETSocketFD, &readset);
+    FD_SET(UNSocketFD, &readset);
 
     while(true){
         if(select(INETSocketFD+5, &readset, NULL, NULL, NULL) < 0) {
             perror("select");
             exit(1);
         }
+        if(FD_ISSET(INETSocketFD, &readset)){
+            msg.state=-6;
+            int newSocket=accept(INETSocketFD, NULL, NULL);
+            write(newSocket, (char*)&msg, sizeof(msg));
+            close(newSocket);
+            msg.state=0;
+        }
+        if(FD_ISSET(UNSocketFD, &readset)){
+            msg.state=-6;
+            int newSocket=accept(UNSocketFD, NULL, NULL);
+            write(newSocket, (char*)&msg, sizeof(msg));
+            close(newSocket);
+            msg.state=0;
+        }
+
         if(FD_ISSET(playerOne.socket, &readset)) handleMessage(playerOne.socket);
         else if(FD_ISSET(playerTwo.socket, &readset)) handleMessage(playerTwo.socket);
+
+        FD_SET(INETSocketFD, &readset);
+        FD_SET(UNSocketFD, &readset);
         FD_SET(playerOne.socket, &readset);
         FD_SET(playerTwo.socket, &readset);
     }

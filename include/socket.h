@@ -15,7 +15,7 @@
 #define BORAD_SIZE 200
 
 #define WIN -2
-#define LOOSE -3
+#define LOSE -3
 #define GOON 0
 #define LEFT -4
 
