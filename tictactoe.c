@@ -136,6 +136,8 @@ int main(){
                 break;
             default:
                 printf("Wrong command try again\n");
+                char ch;
+                while ((ch = getchar()) != '\n' && ch != EOF);
 
         }
     }

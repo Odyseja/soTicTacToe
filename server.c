@@ -11,9 +11,10 @@ char board[BORAD_SIZE][BORAD_SIZE];
 int sizex=BORAD_SIZE;
 int sizey=BORAD_SIZE;
 char ADDR[100];
+int rounds;
 
 int checkOneSide(int changex, int changey, int count, int newx, int newy){
-    while(board[newx][newy]==board[msg.x][msg.y]){
+    while(newx<=sizex && newy<=sizey && board[newx][newy]==board[msg.x][msg.y]){
         newx+=changex;
         newy+=changey;
         count++;
@@ -179,6 +180,12 @@ void handleMessage(int i){
         exit(0);
     }
     else{
+        rounds++;
+        if(rounds==sizex*sizey){
+            msg.state=-10;
+            sendMessage(playerTwo.socket);
+            sendMessage(playerOne.socket);
+        }
         if(i==playerOne.socket) {
             sendMessage(playerTwo.socket);
         }

@@ -15,7 +15,7 @@ pid_t pid;
 
 void printBoard(){
     printf("     ");
-    for(int i=1; i<sizey; i++){
+    for(int i=1; i<=sizey; i++){
         if(i<9)printf("%d  ", i);
         else printf("%d ", i);
     }
@@ -23,7 +23,7 @@ void printBoard(){
     for(int i=1; i<=sizex; i++){
         if(i<10) printf("%d    ", i);
         else printf("%d   ", i);
-        for(int j=1; j<sizey; j++){
+        for(int j=1; j<=sizey; j++){
             if(win[i][j]==0) printf("%c  ", board[i][j]);
             else printf(KRED "%c  " RESET, board[i][j]);
         }
@@ -207,6 +207,15 @@ void endGame(){
     if(msg.state==LEFT){
         printf("Your opponent left\n");
         exit(0);
+    }
+    if(msg.state==-10){
+        system("clear");
+        printf("There is a draw\n");
+        printBoard();
+        printf("To return to main menu, press any key and enter\n");
+        scanf(" %c", &sign);
+        cleanUp();
+        execl("./tictactoe", "tictactoe", NULL);
     }
     if(msg.state==WIN){
         system("clear");
